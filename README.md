@@ -1,9 +1,9 @@
 # Gibiteca - Biblioteca de HQs
 
-Aplicação local em Java 25 + Spring Boot + Thymeleaf + H2 (arquivo).
+Aplicação local em Java 17 + Spring Boot + Thymeleaf + H2 (arquivo).
 
 ## Como rodar
-1. Instale o JDK 25 e o Maven (ou use o Maven do IntelliJ/Eclipse).
+1. Instale o JDK 17 e o Maven (ou use o Maven do IntelliJ/Eclipse).
 2. Na pasta do projeto: `mvn spring-boot:run`
 3. Abra http://localhost:8080
 
