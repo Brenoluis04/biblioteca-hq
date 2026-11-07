@@ -2,7 +2,8 @@ target/
 .idea/
 .vscode/
 *.iml
-# banco local e HQs baixadas (cada PC tem as suas)
-data/*.db
-data/comics/*
 !data/comics/.gitkeep
+
+# H2: arquivos temporários (o banco .mv.db e os PDFs SÃO versionados)
+data/*.lock.db
+data/*.trace.db
