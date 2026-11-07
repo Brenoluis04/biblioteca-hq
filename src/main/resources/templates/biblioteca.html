@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments :: cabecalho('Minha Biblioteca')}"></head>
+<body>
+<header th:replace="~{fragments :: menu('biblioteca')}"></header>
+
+<main class="conteudo">
+    <div th:replace="~{fragments :: mensagens}"></div>
+
+    <section class="titulo-pagina">
+        <h1>Minha Biblioteca</h1>
+        <p th:text="${entradas.size()} + ' HQ(s) salva(s)'">0 HQs salvas</p>
+    </section>
+
+    <div class="vazio" th:if="${entradas.isEmpty()}">
+        <p>Você ainda não salvou nenhuma HQ.</p>
+        <a th:href="@{/}" class="btn btn-primario">Ir para o Hub</a>
+    </div>
+
+    <div class="lista">
+        <article class="item" th:each="e : ${entradas}"
+                 th:with="pagina=${e.currentPage > 0 ? e.currentPage : 1}">
+
+            <div th:replace="~{fragments :: capa(${e.comic})}"></div>
+
+            <div class="item-corpo">
+                <span class="tag" th:if="${e.comic.genre}" th:text="${e.comic.genre}">Gênero</span>
+                <h3 th:text="${e.comic.title}">Título</h3>
+                <p class="autor" th:text="'por ' + ${e.comic.author}">por Autor</p>
+
+                <!-- Progresso de leitura -->
+                <div class="progresso">
+                    <div class="barra"><div class="barra-cheia" th:style="'width:' + ${e.progressPercent} + '%'"></div></div>
+                    <span class="progresso-texto"
+                          th:text="'Página ' + ${e.currentPage} + ' de ' + ${e.comic.totalPages} + ' (' + ${e.progressPercent} + '%)'">
+                        Página 0 de 0 (0%)
+                    </span>
+                </div>
+
+                <form method="post" th:action="@{/biblioteca/{id}/progresso(id=${e.comic.id})}" class="linha-form">
+                    <label>Parei na página
+                        <input type="number" name="pagina" min="0" th:max="${e.comic.totalPages}"
+                               th:value="${e.currentPage}" required>
+                    </label>
+                    <button type="submit" class="btn btn-fantasma">Atualizar</button>
+                </form>
+
+                <!-- Nota de 0 a 5 estrelas -->
+                <form method="post" th:action="@{/biblioteca/{id}/nota(id=${e.comic.id})}" class="estrelas">
+                    <button type="submit" name="nota" th:each="n : ${#numbers.sequence(1, 5)}" th:value="${n}"
+                            th:classappend="${e.rating != null and e.rating >= n} ? 'on'"
+                            th:title="${n} + ' estrela(s)'">★</button>
+                    <button type="submit" name="nota" value="0" class="zerar" title="Nota 0">zerar</button>
+                    <span class="nota-texto" th:text="${e.rating == null} ? 'Sem nota' : (${e.rating} + ' / 5')">Sem nota</span>
+                </form>
+            </div>
+
+            <div class="item-acoes">
+                <a th:if="${e.comic.filePath}"
+                   th:href="@{/comics/{id}/arquivo(id=${e.comic.id})} + '#page=' + ${pagina}"
+                   target="_blank" class="btn btn-primario">Ler</a>
+                <form method="post" th:action="@{/biblioteca/remover/{id}(id=${e.comic.id})}">
+                    <button type="submit" class="btn btn-perigo">Remover</button>
+                </form>
+            </div>
+        </article>
+    </div>
+</main>
+
+<footer th:replace="~{fragments :: rodape}"></footer>
+</body>
+</html>

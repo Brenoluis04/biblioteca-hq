@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments :: cabecalho('Hub')}"></head>
+<body>
+<header th:replace="~{fragments :: menu('hub')}"></header>
+
+<main class="conteudo">
+    <div th:replace="~{fragments :: mensagens}"></div>
+
+    <section class="titulo-pagina">
+        <h1>Hub de HQs</h1>
+        <p>Explore o catálogo e salve suas favoritas na sua biblioteca.</p>
+    </section>
+
+    <!-- Busca e filtro (enviados por GET, o Hub recarrega com o resultado) -->
+    <form method="get" th:action="@{/}" class="filtros">
+        <input type="search" name="busca" th:value="${busca}" placeholder="Buscar por título ou autor...">
+        <select name="genero">
+            <option value="">Todos os gêneros</option>
+            <option th:each="g : ${generos}" th:value="${g}" th:text="${g}" th:selected="${g == genero}"></option>
+        </select>
+        <button type="submit" class="btn btn-primario">Buscar</button>
+        <a th:href="@{/}" class="btn btn-fantasma">Limpar</a>
+    </form>
+
+    <p class="contagem" th:text="${comics.size()} + ' HQ(s) encontrada(s)'"></p>
+
+    <p class="vazio" th:if="${comics.isEmpty()}">Nenhuma HQ encontrada. Tente outra busca ou cadastre uma nova.</p>
+
+    <div class="grade">
+        <article class="card" th:each="c : ${comics}">
+            <div th:replace="~{fragments :: capa(${c})}"></div>
+            <div class="card-corpo">
+                <span class="tag" th:if="${c.genre}" th:text="${c.genre}">Gênero</span>
+                <h3 th:text="${c.title}">Título</h3>
+                <p class="autor" th:text="'por ' + ${c.author}">por Autor</p>
+                <p class="descricao" th:text="${c.description}">Descrição</p>
+                <p class="paginas" th:text="${c.totalPages} + ' páginas'">0 páginas</p>
+            </div>
+            <div class="card-acoes">
+                <form th:if="${!idsSalvos.contains(c.id)}" method="post"
+                      th:action="@{/biblioteca/salvar/{id}(id=${c.id})}">
+                    <button type="submit" class="btn btn-primario">+ Salvar</button>
+                </form>
+                <a th:if="${idsSalvos.contains(c.id)}" th:href="@{/biblioteca}" class="selo">✓ Na biblioteca</a>
+                <a th:if="${c.filePath}" th:href="@{/comics/{id}/arquivo(id=${c.id})}" target="_blank"
+                   class="btn btn-fantasma">Ler</a>
+            </div>
+        </article>
+    </div>
+</main>
+
+<footer th:replace="~{fragments :: rodape}"></footer>
+</body>
+</html>

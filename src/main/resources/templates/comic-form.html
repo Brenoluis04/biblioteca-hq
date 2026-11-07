@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments :: cabecalho('Cadastrar HQ')}"></head>
+<body>
+<header th:replace="~{fragments :: menu('cadastro')}"></header>
+
+<main class="conteudo estreito">
+    <section class="titulo-pagina">
+        <h1>Cadastrar HQ</h1>
+        <p>Adicione uma nova HQ ao catálogo.</p>
+    </section>
+
+    <form method="post" th:action="@{/comics}" th:object="${comic}" enctype="multipart/form-data" class="formulario">
+
+        <label>Título *
+            <input type="text" th:field="*{title}" placeholder="Ex.: Capitão Aurora">
+            <span class="erro-campo" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></span>
+        </label>
+
+        <label>Autor *
+            <input type="text" th:field="*{author}" placeholder="Ex.: Marina Teles">
+            <span class="erro-campo" th:if="${#fields.hasErrors('author')}" th:errors="*{author}"></span>
+        </label>
+
+        <div class="duas-colunas">
+            <label>Gênero
+                <input type="text" th:field="*{genre}" list="lista-generos" placeholder="Ex.: Aventura">
+                <datalist id="lista-generos">
+                    <option th:each="g : ${generos}" th:value="${g}"></option>
+                </datalist>
+            </label>
+
+            <label>Total de páginas *
+                <input type="number" th:field="*{totalPages}" min="1">
+                <span class="erro-campo" th:if="${#fields.hasErrors('totalPages')}" th:errors="*{totalPages}"></span>
+            </label>
+        </div>
+
+        <label>URL da capa (opcional)
+            <input type="url" th:field="*{coverUrl}" placeholder="https://...">
+        </label>
+
+        <label>Descrição
+            <textarea th:field="*{description}" rows="4" maxlength="1000"></textarea>
+        </label>
+
+        <label>Arquivo da HQ em PDF (opcional)
+            <input type="file" name="arquivo" accept=".pdf,application/pdf">
+            <span class="erro-campo" th:if="${#fields.hasErrors('filePath')}" th:errors="*{filePath}"></span>
+        </label>
+
+        <div class="acoes-form">
+            <button type="submit" class="btn btn-primario">Salvar HQ</button>
+            <a th:href="@{/}" class="btn btn-fantasma">Cancelar</a>
+        </div>
+    </form>
+</main>
+
+<footer th:replace="~{fragments :: rodape}"></footer>
+</body>
+</html>

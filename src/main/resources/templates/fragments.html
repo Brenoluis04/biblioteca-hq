@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+
+<!-- Cabeçalho comum (fontes + CSS). Uso: ~{fragments :: cabecalho('Titulo')} -->
+<head th:fragment="cabecalho(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${titulo} + ' · Gibiteca'">Gibiteca</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<!-- Menu superior. Uso: ~{fragments :: menu('hub')} -->
+<header class="topo" th:fragment="menu(ativo)">
+    <a class="logo" th:href="@{/}">Gibi<span>teca</span></a>
+    <nav>
+        <a th:href="@{/}" th:classappend="${ativo == 'hub'} ? 'ativo'">Hub</a>
+        <a th:href="@{/biblioteca}" th:classappend="${ativo == 'biblioteca'} ? 'ativo'">Minha Biblioteca</a>
+        <a th:href="@{/comics/novo}" th:classappend="${ativo == 'cadastro'} ? 'ativo'">+ Cadastrar HQ</a>
+    </nav>
+</header>
+
+<!-- Mensagens de sucesso/erro (vêm dos controllers) -->
+<div th:fragment="mensagens">
+    <p class="msg msg-ok" th:if="${sucesso}" th:text="${sucesso}"></p>
+    <p class="msg msg-erro" th:if="${erro}" th:text="${erro}"></p>
+</div>
+
+<!-- Capa: usa a imagem se existir; senão mostra um bloco colorido com o título -->
+<div th:fragment="capa(comic)" class="capa" th:style="'--matiz:' + ${comic.id * 47 % 360}">
+    <img th:if="${not #strings.isEmpty(comic.coverUrl)}" th:src="${comic.coverUrl}" th:alt="${comic.title}">
+    <div th:unless="${not #strings.isEmpty(comic.coverUrl)}" class="capa-placeholder">
+        <span th:text="${comic.title}">Título</span>
+    </div>
+</div>
+
+<footer class="rodape" th:fragment="rodape">
+    Gibiteca · projeto de faculdade · Java + Spring Boot + H2
+</footer>
+
+</body>
+</html>
