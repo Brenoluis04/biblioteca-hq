@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
-<head th:replace="~{fragments :: cabecalho('Cadastrar HQ')}"></head>
+<head th:replace="~{fragments :: cabecalho(${tituloPagina})}"></head>
 <body>
 <header th:replace="~{fragments :: menu('cadastro')}"></header>
 
 <main class="conteudo estreito">
     <section class="titulo-pagina">
-        <h1>Cadastrar HQ</h1>
-        <p>Adicione uma nova HQ ao catálogo.</p>
+        <h1 th:text="${tituloPagina}">Cadastrar HQ</h1>
+        <p>Preencha os dados da HQ. Os campos com * são obrigatórios.</p>
     </section>
 
-    <form method="post" th:action="@{/comics}" th:object="${comic}" enctype="multipart/form-data" class="formulario">
+    <!-- A mesma tela serve para cadastrar (acao = /comics) e editar (acao = /comics/ID/editar) -->
+    <form method="post" th:action="@{${acao}}" th:object="${comic}" enctype="multipart/form-data" class="formulario">
 
         <label>Título *
-            <input type="text" th:field="*{title}" placeholder="Ex.: Capitão Aurora">
+            <input type="text" th:field="*{title}" placeholder="Ex.: Batman: Ano Um">
             <span class="erro-campo" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></span>
         </label>
 
         <label>Autor *
-            <input type="text" th:field="*{author}" placeholder="Ex.: Marina Teles">
+            <input type="text" th:field="*{author}" placeholder="Ex.: Frank Miller">
             <span class="erro-campo" th:if="${#fields.hasErrors('author')}" th:errors="*{author}"></span>
         </label>
 
@@ -45,12 +46,13 @@
         </label>
 
         <label>Arquivo da HQ em PDF (opcional)
+            <span class="aviso-pdf" th:if="${temPdf}">✓ Esta HQ já tem um PDF. Envie outro só se quiser substituí-lo.</span>
             <input type="file" name="arquivo" accept=".pdf,application/pdf">
             <span class="erro-campo" th:if="${#fields.hasErrors('filePath')}" th:errors="*{filePath}"></span>
         </label>
 
         <div class="acoes-form">
-            <button type="submit" class="btn btn-primario">Salvar HQ</button>
+            <button type="submit" class="btn btn-primario">Salvar</button>
             <a th:href="@{/}" class="btn btn-fantasma">Cancelar</a>
         </div>
     </form>

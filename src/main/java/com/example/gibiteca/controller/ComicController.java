@@ -23,7 +23,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
 
-/** Cadastro de HQs (com upload opcional de PDF) e abertura do PDF para leitura. */
+/** Cadastro, edição e exclusão de HQs (com upload opcional de PDF) e abertura do PDF. */
 @Controller
 public class ComicController {
 
@@ -36,10 +36,12 @@ public class ComicController {
         this.pastaHqs = pastaHqs;
     }
 
+    // ------------------------------------------------------------------ CADASTRAR
+
     @GetMapping("/comics/novo")
     public String formulario(Model model) {
         model.addAttribute("comic", new Comic());
-        model.addAttribute("generos", comicService.listarGeneros());   // LÊ do banco
+        prepararFormulario(model, "/comics", "Cadastrar HQ", false);
         return "comic-form";
     }
 
@@ -67,7 +69,7 @@ public class ComicController {
         }
 
         if (result.hasErrors()) {
-            model.addAttribute("generos", comicService.listarGeneros());
+            prepararFormulario(model, "/comics", "Cadastrar HQ", false);
             return "comic-form";
         }
 
@@ -75,6 +77,77 @@ public class ComicController {
         redirect.addFlashAttribute("sucesso", "HQ \"" + comic.getTitle() + "\" cadastrada!");
         return "redirect:/";
     }
+
+    // ------------------------------------------------------------------ EDITAR
+
+    @GetMapping("/comics/{id}/editar")
+    public String editar(@PathVariable("id") Long id, Model model, RedirectAttributes redirect) {
+        Optional<Comic> comic = comicService.buscarPorId(id);           // LÊ do banco
+        if (comic.isEmpty()) {
+            redirect.addFlashAttribute("erro", "HQ não encontrada");
+            return "redirect:/";
+        }
+        model.addAttribute("comic", comic.get());
+        prepararFormulario(model, "/comics/" + id + "/editar", "Editar HQ",
+                comic.get().getFilePath() != null);
+        return "comic-form";
+    }
+
+    @PostMapping("/comics/{id}/editar")
+    public String salvarEdicao(@PathVariable("id") Long id,
+                               @Valid @ModelAttribute("comic") Comic comic,
+                               BindingResult result,
+                               @RequestParam(name = "arquivo", required = false) MultipartFile arquivo,
+                               Model model,
+                               RedirectAttributes redirect) {
+        Optional<Comic> atual = comicService.buscarPorId(id);           // LÊ do banco
+        if (atual.isEmpty()) {
+            redirect.addFlashAttribute("erro", "HQ não encontrada");
+            return "redirect:/";
+        }
+        String arquivoAntigo = atual.get().getFilePath();
+        comic.setId(id);
+        comic.setFilePath(null);
+
+        boolean temArquivo = arquivo != null && !arquivo.isEmpty();
+        if (temArquivo && !ehPdf(arquivo)) {
+            result.rejectValue("filePath", "arquivo.invalido", "O arquivo precisa ser um PDF");
+        }
+
+        String novoArquivo = null;
+        if (!result.hasErrors() && temArquivo) {
+            try {
+                novoArquivo = salvarPdf(arquivo);
+            } catch (IOException e) {
+                result.rejectValue("filePath", "arquivo.erro", "Não foi possível salvar o arquivo");
+            }
+        }
+
+        if (result.hasErrors()) {
+            prepararFormulario(model, "/comics/" + id + "/editar", "Editar HQ", arquivoAntigo != null);
+            return "comic-form";
+        }
+
+        comicService.atualizar(id, comic, novoArquivo);                 // ESCREVE no banco
+        if (novoArquivo != null && arquivoAntigo != null) {
+            apagarArquivo(arquivoAntigo);                               // troca: remove o PDF antigo
+        }
+        redirect.addFlashAttribute("sucesso", "HQ \"" + comic.getTitle() + "\" atualizada!");
+        return "redirect:/";
+    }
+
+    // ------------------------------------------------------------------ EXCLUIR
+
+    @PostMapping("/comics/{id}/excluir")
+    public String excluir(@PathVariable("id") Long id, RedirectAttributes redirect) {
+        String titulo = comicService.buscarPorId(id).map(Comic::getTitle).orElse("HQ");
+        Optional<String> arquivo = comicService.excluir(id);            // ESCREVE no banco
+        arquivo.ifPresent(this::apagarArquivo);
+        redirect.addFlashAttribute("sucesso", "\"" + titulo + "\" foi excluída do catálogo.");
+        return "redirect:/";
+    }
+
+    // ------------------------------------------------------------------ LER (PDF)
 
     /** Entrega o PDF para o navegador abrir (aceita #page=N na URL). */
     @GetMapping("/comics/{id}/arquivo")
@@ -94,6 +167,16 @@ public class ComicController {
                 .body(new FileSystemResource(arquivo));
     }
 
+    // ------------------------------------------------------------------ AUXILIARES
+
+    /** Dados que o formulário (cadastro e edição) precisa. */
+    private void prepararFormulario(Model model, String acao, String tituloPagina, boolean temPdf) {
+        model.addAttribute("acao", acao);
+        model.addAttribute("tituloPagina", tituloPagina);
+        model.addAttribute("temPdf", temPdf);
+        model.addAttribute("generos", comicService.listarGeneros());    // LÊ do banco
+    }
+
     private boolean ehPdf(MultipartFile arquivo) {
         String nome = arquivo.getOriginalFilename();
         return nome != null && nome.toLowerCase().endsWith(".pdf");
@@ -106,5 +189,18 @@ public class ComicController {
         String nome = UUID.randomUUID() + ".pdf";
         arquivo.transferTo(pasta.resolve(nome));
         return nome;
+    }
+
+    /** Apaga um PDF da pasta de HQs (só dentro dela). Se falhar, o banco já está correto. */
+    private void apagarArquivo(String nome) {
+        try {
+            Path pasta = Paths.get(pastaHqs).toAbsolutePath().normalize();
+            Path arquivo = pasta.resolve(nome).normalize();
+            if (arquivo.startsWith(pasta)) {
+                Files.deleteIfExists(arquivo);
+            }
+        } catch (IOException e) {
+            // ignora: o registro no banco já foi atualizado
+        }
     }
 }

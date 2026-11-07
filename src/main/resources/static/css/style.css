@@ -179,3 +179,9 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--d
     .item-acoes { flex-direction: row; width: 100%; }
     .duas-colunas { grid-template-columns: 1fr; }
 }
+
+/* ---------- Etapa 4: editar/excluir ---------- */
+.btn-pequeno { padding: 5px 12px; font-size: .8rem; }
+.card-acoes form { display: inline; }
+.card-acoes + .card-acoes { padding-top: 0; }
+.aviso-pdf { font-size: .8rem; color: var(--sucesso); font-weight: 600; }

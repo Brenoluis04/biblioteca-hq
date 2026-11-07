@@ -46,6 +46,13 @@
                 <a th:if="${c.filePath}" th:href="@{/comics/{id}/arquivo(id=${c.id})}" target="_blank"
                    class="btn btn-fantasma">Ler</a>
             </div>
+            <div class="card-acoes">
+                <a th:href="@{/comics/{id}/editar(id=${c.id})}" class="btn btn-fantasma btn-pequeno">Editar</a>
+                <form method="post" th:action="@{/comics/{id}/excluir(id=${c.id})}"
+                      onsubmit="return confirm('Excluir esta HQ do catálogo? Ela também sai da sua biblioteca.');">
+                    <button type="submit" class="btn btn-perigo btn-pequeno">Excluir</button>
+                </form>
+            </div>
         </article>
     </div>
 </main>
