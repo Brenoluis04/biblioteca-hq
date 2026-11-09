@@ -12,10 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * Regras da MINHA BIBLIOTECA: salvar, remover, progresso e nota.
- * @Transactional = se algo der erro no meio, o banco desfaz a operação inteira.
- */
 @Service
 public class LibraryService {
 

@@ -7,12 +7,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Seed inicial: roda UMA vez quando a aplicação sobe.
- * Só insere as HQs de exemplo se o catálogo estiver vazio,
- * então reiniciar o programa não duplica nada.
- * Todas as HQs abaixo são FICTÍCIAS.
- */
 @Component
 public class DataSeeder implements CommandLineRunner {
 
@@ -25,7 +19,7 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (comicRepository.count() > 0) {
-            return; // já tem dados, não faz nada
+            return; 
         }
 
         comicRepository.saveAll(List.of(

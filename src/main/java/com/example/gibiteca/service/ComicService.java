@@ -9,10 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Regras do CATÁLOGO. O controller nunca fala direto com o banco:
- * ele chama o service, e o service chama o repository.
- */
 @Service
 public class ComicService {
 
@@ -46,10 +42,6 @@ public class ComicService {
         return comicRepository.save(comic);
     }
 
-    /**
-     * ESCREVE no banco: atualiza os dados de uma HQ.
-     * novoArquivo = nome do PDF recém-enviado; se for null, mantém o PDF que já existia.
-     */
     @Transactional
     public Comic atualizar(Long id, Comic dados, String novoArquivo) {
         Comic comic = comicRepository.findById(id)
@@ -66,10 +58,6 @@ public class ComicService {
         return comicRepository.save(comic);
     }
 
-    /**
-     * ESCREVE no banco: exclui a HQ do catálogo (e da biblioteca, se estiver salva).
-     * Devolve o nome do PDF dela, para o controller apagar o arquivo do disco.
-     */
     @Transactional
     public Optional<String> excluir(Long id) {
         Optional<Comic> comic = comicRepository.findById(id);

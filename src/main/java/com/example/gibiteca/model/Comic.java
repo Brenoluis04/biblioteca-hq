@@ -4,10 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
-/**
- * Uma HQ do CATALOGO (o que aparece no Hub principal).
- * Cada objeto desta classe vira uma linha na tabela "comic".
- */
 @Entity
 @Table(name = "comic")
 public class Comic {
@@ -38,7 +34,7 @@ public class Comic {
     /** Nome do arquivo da HQ (PDF) guardado na pasta data/comics, se houver. */
     private String filePath;
 
-    public Comic() { }  // JPA exige construtor vazio
+    public Comic() { }
 
     public Comic(String title, String author, String genre, String coverUrl,
                  String description, int totalPages) {
@@ -50,7 +46,6 @@ public class Comic {
         this.totalPages = totalPages;
     }
 
-    // ----- getters e setters -----
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getTitle() { return title; }

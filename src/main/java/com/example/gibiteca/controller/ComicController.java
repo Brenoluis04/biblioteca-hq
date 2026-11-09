@@ -28,15 +28,13 @@ import java.util.UUID;
 public class ComicController {
 
     private final ComicService comicService;
-    private final String pastaHqs;   // vem do application.properties (app.pasta-hqs)
+    private final String pastaHqs;   
 
     public ComicController(ComicService comicService,
                            @Value("${app.pasta-hqs}") String pastaHqs) {
         this.comicService = comicService;
         this.pastaHqs = pastaHqs;
     }
-
-    // ------------------------------------------------------------------ CADASTRAR
 
     @GetMapping("/comics/novo")
     public String formulario(Model model) {
@@ -51,7 +49,7 @@ public class ComicController {
                             @RequestParam(name = "arquivo", required = false) MultipartFile arquivo,
                             Model model,
                             RedirectAttributes redirect) {
-        // Segurança básica: o formulário não pode definir id nem caminho de arquivo.
+
         comic.setId(null);
         comic.setFilePath(null);
 
@@ -73,16 +71,14 @@ public class ComicController {
             return "comic-form";
         }
 
-        comicService.cadastrar(comic);                                  // ESCREVE no banco
+        comicService.cadastrar(comic);                                  
         redirect.addFlashAttribute("sucesso", "HQ \"" + comic.getTitle() + "\" cadastrada!");
         return "redirect:/";
     }
 
-    // ------------------------------------------------------------------ EDITAR
-
     @GetMapping("/comics/{id}/editar")
     public String editar(@PathVariable("id") Long id, Model model, RedirectAttributes redirect) {
-        Optional<Comic> comic = comicService.buscarPorId(id);           // LÊ do banco
+        Optional<Comic> comic = comicService.buscarPorId(id);           
         if (comic.isEmpty()) {
             redirect.addFlashAttribute("erro", "HQ não encontrada");
             return "redirect:/";
@@ -100,7 +96,7 @@ public class ComicController {
                                @RequestParam(name = "arquivo", required = false) MultipartFile arquivo,
                                Model model,
                                RedirectAttributes redirect) {
-        Optional<Comic> atual = comicService.buscarPorId(id);           // LÊ do banco
+        Optional<Comic> atual = comicService.buscarPorId(id);          
         if (atual.isEmpty()) {
             redirect.addFlashAttribute("erro", "HQ não encontrada");
             return "redirect:/";
@@ -128,15 +124,13 @@ public class ComicController {
             return "comic-form";
         }
 
-        comicService.atualizar(id, comic, novoArquivo);                 // ESCREVE no banco
+        comicService.atualizar(id, comic, novoArquivo);                 
         if (novoArquivo != null && arquivoAntigo != null) {
-            apagarArquivo(arquivoAntigo);                               // troca: remove o PDF antigo
+            apagarArquivo(arquivoAntigo);                               
         }
         redirect.addFlashAttribute("sucesso", "HQ \"" + comic.getTitle() + "\" atualizada!");
         return "redirect:/";
     }
-
-    // ------------------------------------------------------------------ EXCLUIR
 
     @PostMapping("/comics/{id}/excluir")
     public String excluir(@PathVariable("id") Long id, RedirectAttributes redirect) {
@@ -146,8 +140,6 @@ public class ComicController {
         redirect.addFlashAttribute("sucesso", "\"" + titulo + "\" foi excluída do catálogo.");
         return "redirect:/";
     }
-
-    // ------------------------------------------------------------------ LER (PDF)
 
     /** Entrega o PDF para o navegador abrir (aceita #page=N na URL). */
     @GetMapping("/comics/{id}/arquivo")
@@ -167,14 +159,12 @@ public class ComicController {
                 .body(new FileSystemResource(arquivo));
     }
 
-    // ------------------------------------------------------------------ AUXILIARES
-
     /** Dados que o formulário (cadastro e edição) precisa. */
     private void prepararFormulario(Model model, String acao, String tituloPagina, boolean temPdf) {
         model.addAttribute("acao", acao);
         model.addAttribute("tituloPagina", tituloPagina);
         model.addAttribute("temPdf", temPdf);
-        model.addAttribute("generos", comicService.listarGeneros());    // LÊ do banco
+        model.addAttribute("generos", comicService.listarGeneros());    
     }
 
     private boolean ehPdf(MultipartFile arquivo) {
@@ -200,7 +190,7 @@ public class ComicController {
                 Files.deleteIfExists(arquivo);
             }
         } catch (IOException e) {
-            // ignora: o registro no banco já foi atualizado
+            
         }
     }
 }

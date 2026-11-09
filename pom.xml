@@ -15,7 +15,7 @@
     <artifactId>gibiteca</artifactId>
     <version>0.0.1</version>
     <name>gibiteca</name>
-    <description>Biblioteca de HQs - projeto de faculdade</description>
+    <description>Biblioteca de HQs</description>
 
     <properties>
         <java.version>17</java.version>

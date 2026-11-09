@@ -6,11 +6,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/**
- * Minha Biblioteca: listar, salvar, remover, atualizar progresso e dar nota.
- * Depois de cada ação (POST) redirecionamos para uma página (GET),
- * assim o F5 não repete a ação.
- */
 @Controller
 @RequestMapping("/biblioteca")
 public class LibraryController {
@@ -23,7 +18,7 @@ public class LibraryController {
 
     @GetMapping
     public String listar(Model model) {
-        model.addAttribute("entradas", libraryService.listar());   // LÊ do banco
+        model.addAttribute("entradas", libraryService.listar());   
         return "biblioteca";
     }
 
@@ -32,7 +27,7 @@ public class LibraryController {
                          @RequestHeader(value = "Referer", required = false) String referer,
                          RedirectAttributes redirect) {
         try {
-            libraryService.salvar(comicId);                          // ESCREVE no banco
+            libraryService.salvar(comicId);                          
             redirect.addFlashAttribute("sucesso", "HQ salva na sua biblioteca!");
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("erro", e.getMessage());
@@ -44,7 +39,7 @@ public class LibraryController {
     public String remover(@PathVariable("comicId") Long comicId,
                           @RequestHeader(value = "Referer", required = false) String referer,
                           RedirectAttributes redirect) {
-        libraryService.remover(comicId);                             // ESCREVE no banco
+        libraryService.remover(comicId);                             
         redirect.addFlashAttribute("sucesso", "HQ removida da sua biblioteca.");
         return voltar(referer, "/biblioteca");
     }
@@ -54,7 +49,7 @@ public class LibraryController {
                             @RequestParam("pagina") int pagina,
                             RedirectAttributes redirect) {
         try {
-            libraryService.atualizarProgresso(comicId, pagina);      // ESCREVE no banco
+            libraryService.atualizarProgresso(comicId, pagina);      
             redirect.addFlashAttribute("sucesso", "Progresso atualizado!");
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("erro", e.getMessage());
@@ -67,7 +62,7 @@ public class LibraryController {
                        @RequestParam("nota") int nota,
                        RedirectAttributes redirect) {
         try {
-            libraryService.avaliar(comicId, nota);                   // ESCREVE no banco
+            libraryService.avaliar(comicId, nota);                   
             redirect.addFlashAttribute("sucesso", "Nota registrada!");
         } catch (IllegalArgumentException e) {
             redirect.addFlashAttribute("erro", e.getMessage());

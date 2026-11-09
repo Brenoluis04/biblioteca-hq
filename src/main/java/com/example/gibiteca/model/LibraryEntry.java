@@ -3,12 +3,6 @@ package com.example.gibiteca.model;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
-/**
- * Uma HQ SALVA na "Minha Biblioteca".
- * Guarda o que é pessoal: progresso de leitura e nota.
- * Relação: cada entrada aponta para exatamente UMA HQ do catálogo,
- * e cada HQ só pode ser salva uma vez (unique).
- */
 @Entity
 @Table(name = "library_entry")
 public class LibraryEntry {
@@ -42,8 +36,7 @@ public class LibraryEntry {
         int pct = (int) Math.round(currentPage * 100.0 / comic.getTotalPages());
         return Math.min(pct, 100);
     }
-
-    // ----- getters e setters -----
+    
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Comic getComic() { return comic; }

@@ -7,17 +7,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-/**
- * Acesso ao banco para a tabela "comic".
- * Só de estender JpaRepository já ganhamos, SEM escrever SQL:
- * save(), findById(), findAll(), count(), deleteById()...
- */
 public interface ComicRepository extends JpaRepository<Comic, Long> {
 
-    /**
-     * Busca do Hub: procura o texto no título OU no autor e, se um gênero
-     * for informado, filtra por ele. Texto vazio ('') = "não filtrar".
-     */
     @Query("SELECT c FROM Comic c "
          + "WHERE (:busca = '' OR LOWER(c.title) LIKE LOWER(CONCAT('%', :busca, '%')) "
          + "                   OR LOWER(c.author) LIKE LOWER(CONCAT('%', :busca, '%'))) "
